@@ -396,6 +396,7 @@
 <body>
     <div class="stats-panel">
         <h3 id="playerNameDisplay">📊 STATS DO JOGADOR</h3>
+        <!-- ... (stats items como antes) ... -->
         <div class="stat-item">
             <span class="stat-label">🌟 Nível:</span>
             <span class="stat-value" id="currentLevel">1 (Novato)</span>
@@ -450,6 +451,7 @@
     </div>
 
     <div id="questDetailModal" class="modal">
+        <!-- ... (conteúdo do modal como antes) ... -->
         <div class="modal-content">
             <span class="modal-close" onclick="closeQuestDetailModal()">×</span>
             <h2 id="modalQuestTitle">Detalhes da Quest</h2>
@@ -466,7 +468,7 @@
         // --- DATA DEFINITION ---
         let gameData = {
             playerName: "Everton Mereles Costa",
-            mainMission: "Construir um império de IA do zero aos data centers",
+            mainMission: "Construir um império de IA do zero aos data centers (Plano de 2 anos para SaaS)",
             playerStats: {
                 xp: 0,
                 level: 1,
@@ -481,21 +483,21 @@
                     title: "FASE 0",
                     subtitle: "Automação Sob Demanda",
                     icon: "🔧",
-                    timeline: "⏱️ Meses 1-6 | 🎯 R$5K-15K/mês",
-                    milestone: { text: "INÍCIO!", position: "25%" },
+                    timeline: "⏱️ Meses 0-6 do plano | 🎯 R$5K-15K/mês",
+                    milestone: { text: "INÍCIO!", position: "15%" }, // Ajustado para novo fluxo
                     rewardText: [
                         "Título: 'Automatizador Iniciante'",
                         "Desbloqueia: Fase 1 - SaaS",
                         "Conquista: Base sólida de clientes"
                     ],
-                    quests: [
+                    quests: [ // Mesmas quests da Fase 0 da versão anterior
                         { id: "q0_ia_1", text: "🎯 Definir nicho inicial (contabilidade/imobiliária, consultoria para pequenos negócios, otimização para criadores de conteúdo, etc.)", xp: 20, completed: false, obstacles: [], notes: "" },
                         { id: "q0_ia_2", text: "🌐 Configurar n8n em servidor próprio", xp: 25, completed: false, obstacles: [], notes: "" },
                         { id: "q0_ia_n8n_funnel", text: "🔄 Criar fluxo N8N para funil perpétuo de vendas orgânicas (captação e conversão)", xp: 60, completed: false, obstacles: ["Definir estratégia de conteúdo orgânico", "Configurar gatilhos e integrações"], notes: "Foco em automação de lead magnet, email marketing e qualificação." },
                         { id: "q0_ia_3", text: "📋 Fazer 10 diagnósticos gratuitos", xp: 30, completed: false, obstacles: [], notes: "" },
                         { id: "q0_ia_4", text: "🤖 Criar primeira automação completa para cliente", xp: 35, completed: false, obstacles: [], notes: "" },
                         { id: "q0_ia_5", text: "💰 Fechar primeiro contrato de R$1.500+", xp: 50, setRevenue: 1500, clientsGain: 1, completed: false, obstacles: [], notes: "" },
-                        { id: "q0_ia_6", text: "📈 Atingir 5 clientes pagantes", xp: 40, setRevenueBasedOnClients: { baseRate: 1500, count: 5 }, clientsTarget: 5, completed: false, obstacles: [], notes: "" }, // clientTarget para UI, setRevenue para lógica
+                        { id: "q0_ia_6", text: "📈 Atingir 5 clientes pagantes", xp: 40, setRevenueBasedOnClients: { baseRate: 1500, count: 5 }, clientsTarget: 5, completed: false, obstacles: [], notes: "" },
                         { id: "q0_ia_7", text: "📚 Documentar 10 templates replicáveis", xp: 25, completed: false, obstacles: [], notes: "" },
                         { id: "q0_ia_8", text: "🎊 BOSS: R$10K/mês em receita recorrente", xp: 100, setRevenue: 10000, completed: false, obstacles: [], notes: "" }
                     ]
@@ -505,14 +507,14 @@
                     title: "FASE 1",
                     subtitle: "Produtos SaaS",
                     icon: "💻",
-                    timeline: "⏱️ Meses 4-12 | 🎯 R$20K-50K/mês MRR",
-                    milestone: { text: "MVP", position: "50%" },
+                    timeline: "⏱️ Meses 6-24 do plano | 🎯 R$20K-50K/mês MRR", // Tempo acumulado
+                    milestone: { text: "SAAS PRO", position: "50%" }, // Ajustado
                     rewardText: [
                         "Título: 'Fundador de SaaS'",
-                        "Desbloqueia: Marketplace + Fase 2",
-                        "Conquista: Produto escalável"
+                        "Desbloqueia: Fase 2 - Infraestrutura",
+                        "Conquista: Produto escalável e receita sólida"
                     ],
-                    quests: [
+                    quests: [ // Mesmas quests da Fase 1 da versão anterior
                         { id: "q1_ia_1", text: "🔍 Identificar automação mais demandada para SaaS", xp: 20, completed: false, obstacles: [], notes: "" },
                         { id: "q1_ia_2", text: "🛠️ Desenvolver MVP do SaaS em 30 dias", xp: 60, completed: false, obstacles: [], notes: "" },
                         { id: "q1_ia_3", text: "🧪 Beta test com 10 clientes para o SaaS", xp: 30, clientsGain: 10, completed: false, obstacles: [], notes: "Estes são clientes do SaaS, podem ser diferentes dos de automação." },
@@ -523,39 +525,20 @@
                         { id: "q1_ia_8", text: "🎊 BOSS: R$30K MRR sustentável com o SaaS", xp: 100, setRevenue: 30000, completed: false, obstacles: [], notes: "" }
                     ]
                 },
-                {
-                    id: "phase15_ia",
-                    title: "FASE 1.5",
-                    subtitle: "Marketplace",
-                    icon: "🏪",
-                    timeline: "⏱️ Meses 8-15 | 🎯 Receita passiva",
-                    milestone: { text: "SCALE", position: "65%" },
-                    rewardText: [
-                        "Título: 'Marketplace Master'",
-                        "Receita passiva estabelecida",
-                        "Network de desenvolvedores"
-                    ],
-                    quests: [
-                        { id: "q15_ia_1", text: "🏪 Criar marketplace de templates de automação/IA", xp: 50, completed: false, obstacles: [], notes: "" },
-                        { id: "q15_ia_2", text: "👥 Recrutar 5 desenvolvedores parceiros para o marketplace", xp: 30, completed: false, obstacles: [], notes: "" },
-                        { id: "q15_ia_3", text: "💰 Definir e implementar sistema de comissões (ex: 30% para a plataforma)", xp: 25, completed: false, obstacles: [], notes: "" },
-                        { id: "q15_ia_4", text: "📈 Ter 50+ templates de qualidade no marketplace", xp: 40, completed: false, obstacles: [], notes: "" },
-                        { id: "q15_ia_5", text: "🎊 BOSS: R$10K/mês em receita de comissões do marketplace", xp: 100, revenueGain: 10000, completed: false, obstacles: [], notes: "Este ganho é somado à receita existente." }
-                    ]
-                },
+                // FASE 1.5 REMOVIDA
                 {
                     id: "phase2_ia",
                     title: "FASE 2",
                     subtitle: "Infraestrutura IA",
                     icon: "🏗️",
-                    timeline: "⏱️ Meses 12-24+ | 🎯 \"AWS da América Latina\"",
-                    milestone: { text: "DATACENTER", position: "85%" },
+                    timeline: "⏱️ A partir do Mês 24+ | 🎯 \"AWS da América Latina\"", // Começa após os 2 anos
+                    milestone: { text: "IMPERADOR IA", position: "85%" }, // Ajustado
                     rewardText: [
                         "Título: 'Imperador da IA'",
                         "Infraestrutura continental",
                         "Legacy empresarial"
                     ],
-                    quests: [
+                    quests: [ // Mesmas quests da Fase 2 da versão anterior
                         { id: "q2_ia_1", text: "🌍 Estudo de viabilidade para data center (ex: Itaipu)", xp: 30, completed: false, obstacles: [], notes: "" },
                         { id: "q2_ia_2", text: "🤝 Formar parcerias estratégicas com empresas de energia/investidores", xp: 40, completed: false, obstacles: [], notes: "" },
                         { id: "q2_ia_3", text: "📋 Resolver trâmites jurídicos e buscar incentivos fiscais", xp: 25, completed: false, obstacles: [], notes: "" },
@@ -570,12 +553,15 @@
         };
 
         // --- Constantes e Variáveis Globais ---
+        // ... (como antes, mas LEVEL_NAMES pode ser ajustado se o número de fases mudar muito o "sentimento" dos níveis)
         let TOTAL_QUESTS = 0;
-        const LEVEL_XP_THRESHOLD = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5000, 7000, 10000];
-        const LEVEL_NAMES = ["Novato", "Automatizador", "Estrategista de Funil", "Fundador SaaS", "Arquiteto de Soluções", "Mestre do Marketplace", "Visionário Tecnológico", "Construtor de Impérios", "Magnata da IA", "Lenda Digital", "Semideus da Inovação", "Imperador da IA"];
+        const LEVEL_XP_THRESHOLD = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5000, 7000, 10000]; // Manter ou ajustar
+        const LEVEL_NAMES = ["Novato", "Automatizador", "Estrategista de Funil", "Fundador SaaS", "Arquiteto de Soluções", "Visionário Tecnológico", "Construtor de Impérios", "Magnata da IA", "Lenda Digital", "Semideus da Inovação", "Imperador da IA"]; // Removido "Mestre do Marketplace"
         let currentOpenQuestId = null;
 
-        // --- DOM Elements Cache ---
+
+        // --- DOM Elements Cache (como antes) ---
+        // ...
         let timelineContainer, progressFill, progressText, mainMissionSubtitle, playerNameDisplay,
             currentLevelDisplay, currentXPDisplay, revenueDisplay, clientsDisplay,
             completedQuestsCountDisplay, streakDisplay, nextQuestTextDisplay, nextQuestDeadlineDisplay,
@@ -606,41 +592,46 @@
             modalQuestNotes = document.getElementById('modalQuestNotes');
         }
 
-        // --- Game Logic ---
+        // --- Game Logic (como antes, com a função recalculateTotalRevenueAndClients) ---
+        // ...
         function calculateTotalQuests() {
             TOTAL_QUESTS = gameData.phases.reduce((sum, phase) => sum + phase.quests.length, 0);
         }
 
         function saveProgress() {
-            localStorage.setItem('evertonQuestGameData_IA_v3', JSON.stringify(gameData)); // Nova versão
+            localStorage.setItem('evertonQuestGameData_IA_v4', JSON.stringify(gameData)); // Nova versão pela mudança de fases
         }
 
         function loadProgress() {
-            const savedData = localStorage.getItem('evertonQuestGameData_IA_v3');
+            const savedData = localStorage.getItem('evertonQuestGameData_IA_v4');
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
-                gameData = {
-                    ...gameData,
-                    ...parsedData,
-                    playerStats: {
-                        ...gameData.playerStats,
-                        ...(parsedData.playerStats || {})
-                    },
-                    phases: gameData.phases.map(defaultPhase => {
-                        const savedPhase = parsedData.phases ? parsedData.phases.find(sp => sp.id === defaultPhase.id) : null;
-                        if (savedPhase) {
-                            return {
-                                ...defaultPhase,
-                                ...savedPhase,
-                                quests: defaultPhase.quests.map(defaultQuest => {
-                                    const savedQuest = savedPhase.quests ? savedPhase.quests.find(sq => sq.id === defaultQuest.id) : null;
-                                    return savedQuest ? { ...defaultQuest, ...savedQuest } : defaultQuest;
-                                })
-                            };
-                        }
-                        return defaultPhase;
-                    })
-                };
+                // Deep merge para garantir que novas quests/propriedades não sejam perdidas se o usuário tiver dados antigos
+                gameData.playerName = parsedData.playerName || gameData.playerName;
+                gameData.mainMission = parsedData.mainMission || gameData.mainMission;
+                gameData.playerStats = { ...gameData.playerStats, ...(parsedData.playerStats || {}) };
+
+                const defaultPhases = JSON.parse(JSON.stringify(gameData.phases)); // Cópia profunda das fases padrão
+
+                gameData.phases = defaultPhases.map(defaultPhase => {
+                    const savedPhase = parsedData.phases ? parsedData.phases.find(sp => sp.id === defaultPhase.id) : null;
+                    if (savedPhase) {
+                        const mergedPhase = { ...defaultPhase, ...savedPhase }; // Sobrescreve o padrão com o salvo
+                        mergedPhase.quests = defaultPhase.quests.map(defaultQuest => {
+                            const savedQuest = savedPhase.quests ? savedPhase.quests.find(sq => sq.id === defaultQuest.id) : null;
+                            return savedQuest ? { ...defaultQuest, ...savedQuest } : defaultQuest;
+                        });
+                        return mergedPhase;
+                    }
+                    return defaultPhase; // Se a fase não existir nos dados salvos (ex: foi removida do código), ela não será incluída
+                }).filter(phase => phase !== undefined); // Filtra fases que podem ter sido removidas
+
+                // Se uma fase foi removida do código, mas existe nos dados salvos, ela não será carregada.
+                // Precisamos garantir que as fases carregadas sejam apenas as que existem no `gameData` atual.
+                const currentPhaseIds = gameData.phases.map(p => p.id);
+                gameData.phases = gameData.phases.filter(p => currentPhaseIds.includes(p.id));
+
+
             }
             calculateTotalQuests();
         }
@@ -652,7 +643,6 @@
             }
             return null;
         }
-
         function toggleQuest(questId) {
             const quest = getQuestById(questId);
             if (!quest) return;
@@ -660,17 +650,15 @@
             const questWasCompleted = quest.completed;
             quest.completed = !quest.completed;
 
-            if (quest.completed && !questWasCompleted) { // Quest ACABA de ser completada
+            if (quest.completed && !questWasCompleted) {
                 gameData.playerStats.xp += quest.xp || 0;
                 gameData.playerStats.streak++;
 
-                // Lógica de Receita e Clientes
                 if (quest.setRevenue) {
                     gameData.playerStats.revenue = quest.setRevenue;
                 } else if (quest.setRevenueBasedOnClients) {
-                    // Garantir que o número de clientes ativos reflita o alvo da quest antes de calcular
                     if (quest.clientsTarget && gameData.playerStats.clients < quest.clientsTarget) {
-                         gameData.playerStats.clients = quest.clientsTarget; // Define o número de clientes para o alvo
+                         gameData.playerStats.clients = quest.clientsTarget;
                     }
                     gameData.playerStats.revenue = quest.setRevenueBasedOnClients.baseRate * gameData.playerStats.clients;
                 } else if (quest.revenueGain) {
@@ -680,42 +668,15 @@
                 if (quest.clientsGain) {
                     gameData.playerStats.clients += quest.clientsGain;
                 } else if (quest.clientsTarget && gameData.playerStats.clients < quest.clientsTarget) {
-                     // Se setRevenueBasedOnClients já cuidou disso, não precisa fazer de novo
-                     // mas se for uma quest apenas de alvo de clientes sem setRevenueBasedOnClients:
                     if (!quest.setRevenueBasedOnClients) {
                         gameData.playerStats.clients = quest.clientsTarget;
                     }
                 }
-
-
                 showAchievement("✨ Quest Concluída!", `Você ganhou ${quest.xp || 0} XP por completar: ${quest.text}`);
-
-            } else if (!quest.completed && questWasCompleted) { // Quest está sendo DESMARCADA
+            } else if (!quest.completed && questWasCompleted) {
                 gameData.playerStats.xp -= quest.xp || 0;
                 if(gameData.playerStats.xp < 0) gameData.playerStats.xp = 0;
                 gameData.playerStats.streak = Math.max(0, gameData.playerStats.streak -1 );
-
-                // Reverter ganhos (lógica mais complexa, idealmente deveria reverter ao estado anterior)
-                // Por simplicidade, vamos apenas subtrair ou zerar se for 'setRevenue'
-                // Esta parte de "desfazer" receita é complexa e pode precisar de um histórico.
-                // Para este sistema, ao desmarcar, a receita pode não voltar exatamente ao valor anterior
-                // se múltiplas quests que usam "setRevenue" foram desmarcadas em ordem diferente.
-                if (quest.setRevenue) {
-                    // Idealmente, procurar a quest anterior que definiu a receita.
-                    // Por ora, uma simplificação: se desmarcar uma quest "setRevenue",
-                    // a receita pode precisar ser recalculada com base nas outras quests completas.
-                    // Ou, para simplificar mais ainda, não reverter "setRevenue" automaticamente ao desmarcar,
-                    // pois o usuário pode estar apenas corrigindo um clique.
-                    // A forma mais segura de reverter é recalcular a receita total baseada em TODAS as quests completas.
-                } else if (quest.setRevenueBasedOnClients) {
-                    // Similar ao setRevenue
-                } else if (quest.revenueGain) {
-                    gameData.playerStats.revenue -= quest.revenueGain;
-                }
-                if (quest.clientsGain) {
-                    gameData.playerStats.clients -= quest.clientsGain;
-                }
-                // Para simplificar o "desfazer", vamos forçar um recálculo da receita total ao desmarcar.
                 recalculateTotalRevenueAndClients();
             }
             
@@ -727,47 +688,36 @@
         function recalculateTotalRevenueAndClients() {
             let newRevenue = 0;
             let newClients = 0;
-            let lastSetRevenue = 0; // Para lidar com quests que definem a receita total
-            let lastSetRevenueBasedOnClients = null;
-            let clientMilestonesHit = {}; // Para setRevenueBasedOnClients
-
+            let currentBaseRevenue = 0; // Armazena o valor da última quest "setRevenue" ou "setRevenueBasedOnClients"
+            
+            // Ordenar quests completas por uma ordem lógica (ex: pela ordem no gameData) pode ser útil aqui, mas vamos simplificar
+            // Iterar sobre todas as quests e aplicar seus efeitos cumulativamente, respeitando "set"
+            const completedQuestsInOrder = [];
             gameData.phases.forEach(phase => {
                 phase.quests.forEach(quest => {
                     if (quest.completed) {
-                        if (quest.clientsGain) newClients += quest.clientsGain;
-                        if (quest.clientsTarget && !clientMilestonesHit[quest.id]) {
-                             // Se a quest tem um target de clientes e ainda não foi "contabilizada" para esse target
-                            if (newClients < quest.clientsTarget) newClients = quest.clientsTarget; // Atualiza se o target for maior
-                            clientMilestonesHit[quest.id] = true; // Marca como contabilizada
-                        }
-
-                        if (quest.setRevenue) {
-                            lastSetRevenue = quest.setRevenue; // A última quest "setRevenue" completada define a base
-                            newRevenue = lastSetRevenue; // Atualiza a receita
-                        } else if (quest.setRevenueBasedOnClients) {
-                            lastSetRevenueBasedOnClients = quest.setRevenueBasedOnClients; // Guarda a regra
-                            // O cálculo final da receita será feito após processar todos os clientes
-                        } else if (quest.revenueGain) {
-                            if(lastSetRevenue > 0 || lastSetRevenueBasedOnClients){
-                                // Se uma quest "setRevenue" já ocorreu, os revenueGain são somados a ela
-                                newRevenue += quest.revenueGain;
-                            } else {
-                                // Caso contrário, apenas soma ao que já tinha (se não houver setRevenue)
-                                newRevenue += quest.revenueGain;
-                            }
-                        }
+                        completedQuestsInOrder.push(quest);
                     }
                 });
             });
 
-            // Se houve uma quest "setRevenueBasedOnClients" como a última definidora de receita
-            if(lastSetRevenueBasedOnClients && lastSetRevenue === 0) { // Apenas se não houver um "setRevenue" mais recente
-                newRevenue = lastSetRevenueBasedOnClients.baseRate * newClients;
-            } else if (lastSetRevenue > 0) { // Se a última foi "setRevenue", ela já definiu newRevenue
-                 // os revenueGains já foram somados a 'newRevenue'
-            }
-            // Se não houver nenhuma quest "setRevenue" ou "setRevenueBasedOnClients", newRevenue terá a soma dos revenueGains.
+            completedQuestsInOrder.forEach(quest => {
+                if (quest.clientsGain) newClients += quest.clientsGain;
+                 else if (quest.clientsTarget && newClients < quest.clientsTarget) {
+                    newClients = quest.clientsTarget;
+                }
 
+                if (quest.setRevenue) {
+                    currentBaseRevenue = quest.setRevenue;
+                    newRevenue = currentBaseRevenue; // Zera e define a nova base
+                } else if (quest.setRevenueBasedOnClients) {
+                    currentBaseRevenue = quest.setRevenueBasedOnClients.baseRate * newClients; // Usa os clientes *atuais* para definir a base
+                    newRevenue = currentBaseRevenue;
+                } else if (quest.revenueGain) {
+                    newRevenue += quest.revenueGain; // Soma à receita atual (que pode ter sido definida por um 'setRevenue')
+                }
+            });
+            
             gameData.playerStats.revenue = newRevenue;
             gameData.playerStats.clients = newClients;
         }
@@ -806,8 +756,9 @@
             return false;
         }
 
-        // --- UI Rendering ---
-        function renderPhases() {
+        // --- UI Rendering (como antes) ---
+        // ...
+         function renderPhases() {
             timelineContainer.innerHTML = '';
             gameData.phases.forEach(phaseData => {
                 const phaseDiv = document.createElement('div');
@@ -913,10 +864,14 @@
             if (nextQuest) {
                 nextQuestTextDisplay.textContent = nextQuest.text;
                 const phaseIdPrefix = nextQuest.id.substring(0, nextQuest.id.indexOf('_'));
-                let days = 7;
-                if (phaseIdPrefix === 'q1') days = 14;
-                if (phaseIdPrefix === 'q15') days = 20;
-                if (phaseIdPrefix === 'q2') days = 30;
+                let days = 7; // Default
+                // Extrair o número da fase do ID da quest, ex: q0, q1, q2
+                const phaseNumberMatch = phaseIdPrefix.match(/\d+/);
+                if (phaseNumberMatch) {
+                    const phaseNum = parseInt(phaseNumberMatch[0]);
+                    if (phaseNum === 1) days = 14; // Fase 1
+                    else if (phaseNum === 2) days = 30; // Fase 2
+                }
                 nextQuestDeadlineDisplay.textContent = nextQuest.deadline || `Deadline: ${days} dias`;
             } else {
                 nextQuestTextDisplay.textContent = "🎊 PARABÉNS! TODAS AS QUESTS CONCLUÍDAS!";
@@ -934,7 +889,8 @@
             updateNextQuestDisplay();
         }
 
-        // --- Achievement Popup Logic ---
+        // --- Achievement Popup Logic (como antes) ---
+        // ...
         function showAchievement(title, text) {
             achievementTitle.textContent = title;
             achievementText.innerHTML = text.replace(/\n/g, '<br>');
@@ -945,8 +901,9 @@
             achievementPopup.classList.remove('show');
         }
 
-        // --- Quest Detail Modal Logic ---
-        function openQuestDetailModal(questId) {
+        // --- Quest Detail Modal Logic (como antes) ---
+        // ...
+         function openQuestDetailModal(questId) {
             currentOpenQuestId = questId;
             const quest = getQuestById(questId);
             if (!quest) return;
@@ -984,8 +941,8 @@
                 }
             }
         }
-        
-        // Event Listeners for Modal ---
+        // --- Event Listeners for Modal (como antes) ---
+        // ...
         function setupModalEventListeners() {
             window.onclick = function(event) {
                 if (event.target == questDetailModal) {
@@ -998,16 +955,15 @@
                 }
             }
         }
-
         // --- Initialization ---
         function initializeGame() {
             cacheDOMElements();
             loadProgress();
-            recalculateTotalRevenueAndClients(); // Garante que a receita e clientes estejam corretos no carregamento
+            recalculateTotalRevenueAndClients();
             checkLevelUp();
             updateAllUI();
             setupModalEventListeners();
-            console.log("🎮 Mapa de Quest do Everton Carregado! v3");
+            console.log("🎮 Mapa de Quest do Everton Carregado! v4 - Tempo Acumulativo");
         }
 
         document.addEventListener('DOMContentLoaded', initializeGame);
