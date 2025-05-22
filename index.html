@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗺️ Mapa de Quest - Everton Mereles Costa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 1. Ajuste no BODY para criar espaço para a barra fixa no topo */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: auto;
+            padding-top: 85px; /* Aumentei um pouco para garantir espaço, ajuste se necessário */
+        }
+
+        .quest-map {
+            width: 100%;
+            /* min-width: 1200px; Removido para melhor responsividade com a barra fixa */
+            padding: 20px;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between; /* Ajustar para space-around ou center se houver menos de 4 fases */
+            align-items: flex-start;
+            gap: 20px; /* Reduzir um pouco o gap se necessário */
+            margin: 40px 0;
+            position: relative;
+            flex-wrap: wrap; /* Permitir que as fases quebrem linha */
+        }
+
+        .timeline::before { /* A linha horizontal pode precisar de ajustes ou ser removida se as fases quebrarem muito */
+            content: '';
+            position: absolute;
+            top: 100px;
+            left: 5%; /* Ajustar para não ir de ponta a ponta se houver wrap */
+            right: 5%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .phase {
+            flex: 1 1 300px; /* Permitir que encolha e cresça, com base de 300px */
+            max-width: 450px; /* Limitar largura máxima para melhor wrap */
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            cursor: default;
+            margin-bottom: 20px; /* Adicionar margem inferior para fases que quebram linha */
+        }
+
+        .phase:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .phase.completed {
+            background: rgba(0,255,136,0.2);
+            border-color: #00ff88;
+        }
+
+        .phase.active {
+            background: rgba(255,193,7,0.2);
+            border-color: #ffc107;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,193,7,0.2); }
+            50% { box-shadow: 0 0 20px rgba(255,193,7,0.4); }
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .phase-icon {
+            font-size: 3em;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+        .phase-title-container {}
+        .phase-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .phase-subtitle {
+            font-size: 1em;
+            color: #eee;
+        }
+
+        .phase-timeline-desc {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .quest-list {
+            margin: 20px 0;
+        }
+
+        .quest-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quest-item:hover {
+            background: rgba(0,0,0,0.4);
+            transform: translateX(5px);
+        }
+
+        .quest-item.completed {
+            opacity: 0.6;
+            border-left-color: #00ff88;
+            text-decoration: line-through;
+        }
+
+        .quest-item.completed .quest-checkbox {
+            background: #00ff88;
+            border-color: #00ff88;
+        }
+
+        .quest-item.completed .quest-checkbox::after {
+            content: '✔';
+            color: white;
+            display: block;
+            text-align: center;
+            line-height: 18px;
+            font-size: 14px;
+        }
+
+        .quest-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .quest-text {
+            flex: 1;
+            font-size: 1em;
+        }
+
+        .quest-xp {
+            font-size: 0.8em;
+            color: #ffc107;
+            margin-left: auto;
+            padding-left: 10px;
+        }
+
+        .reward-section {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .reward-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .reward-item { font-size: 0.9em; }
+
+        /* 2. Modificações no .stats-panel para fixá-lo no topo e estilizá-lo como uma barra */
+        .stats-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.90);
+            padding: 10px 15px; /* Reduzido um pouco o padding lateral */
+            border-radius: 0;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* 3. Ajustes no título (H3) dentro do painel de stats */
+        .stats-panel h3 {
+            margin: 0 15px 5px 0; /* Margem inferior se quebrar linha */
+            border-bottom: none;
+            padding-bottom: 0;
+            font-size: 1.1em;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 4. Ajustes nos itens (.stat-item) para layout horizontal na barra */
+        .stat-item {
+            margin: 5px 10px;
+            padding: 0;
+            border-bottom: none;
+            text-align: center;
+        }
+
+        /* 5. Para empilhar o label e o valor dentro de cada .stat-item na barra */
+        .stat-item span {
+            display: block;
+        }
+        .stat-label {
+            color: #ccc;
+            font-size: 0.75em;
+            margin-bottom: 2px;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .milestone-marker {
+            position: absolute;
+            top: 85px; /* Pode precisar de ajuste se o header da fase mudar de altura */
+            background: #ffc107;
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8em;
+            z-index: 3;
+            animation: bounce 2s infinite;
+            transform: translateX(-50%);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+            40% { transform: translate(-50%, -10px); }
+            60% { transform: translate(-50%, -5px); }
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .achievement-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .achievement-popup h2 { margin-bottom: 15px; }
+
+        .next-quest-panel {
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .next-quest-panel h3 {
+            margin-bottom: 10px;
+            color: #ffc107;
+        }
+        #nextQuestText { font-size: 1.1em; }
+        #nextQuestDeadline { font-size: 0.9em; color: #ddd; margin-top: 5px; }
+
+        .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        .modal-content { background-color: #2c3e50; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 15px; color: white; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 15px; right: 25px; }
+        .modal-close:hover, .modal-close:focus { color: #fff; text-decoration: none; }
+        .modal h2 { color: #4ecdc4; margin-bottom: 20px; }
+        .modal p { margin-bottom: 10px; }
+        .modal textarea { width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid #555; color: white; padding: 10px; border-radius: 8px; margin-top:10px; }
+        .modal h4 { margin-top: 15px; color: #ffc107; }
+        .modal ul { list-style: square; margin-left: 20px; }
+
+        /* 6. Ajuste na regra de @media */
+        @media (max-width: 1200px) { /* Continua sendo a principal para a quebra das fases */
+            .timeline {
+                flex-direction: column; /* Força fases a ficarem uma abaixo da outra */
+                align-items: center; /* Centraliza as fases na coluna */
+            }
+            .timeline::before {
+                display: none; /* Linha horizontal não faz sentido em coluna */
+            }
+            .phase {
+                flex-basis: 100%; /* Fase ocupa toda a largura disponível na coluna */
+                max-width: 600px; /* Limita a largura máxima da fase em coluna */
+            }
+        }
+        @media (max-width: 768px) { /* Ajustes finos para a barra de stats em telas menores */
+            body {
+                padding-top: 120px; /* Aumentar mais o padding se a barra de stats ficar muito alta */
+            }
+            .stats-panel h3 {
+                font-size: 1em;
+                width: 100%; /* Título ocupa toda a largura */
+                text-align: center;
+                margin-bottom: 8px;
+            }
+            .stat-label {
+                font-size: 0.7em;
+            }
+            .stat-value {
+                font-size: 0.85em;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+        @media (max-width: 480px) {
+             body {
+                padding-top: 150px; /* Ainda mais padding para telas bem pequenas */
+            }
+            .stats-panel {
+                padding: 8px 5px; /* Menos padding lateral na barra */
+            }
+             .stats-panel h3 {
+                font-size: 0.9em;
+            }
+            .stat-item {
+                margin: 3px 5px; /* Menos margem entre itens de stats */
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="stats-panel"> <!-- Movido para fora do .quest-map para ser irmão do body ou um filho direto do body -->
+        <h3 id="playerNameDisplay">📊 STATS DO JOGADOR</h3>
+        <div class="stat-item">
+            <span class="stat-label">🌟 Nível:</span>
+            <span class="stat-value" id="currentLevel">1 (Novato)</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">✨ XP:</span>
+            <span class="stat-value" id="currentXP">0 / 100</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">💰 Receita Mensal:</span>
+            <span class="stat-value" id="revenue">R$ 0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">🏢 Clientes Ativos:</span>
+            <span class="stat-value" id="clients">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">🎯 Quests Concluídas:</span>
+            <span class="stat-value" id="completedQuestsCount">0/0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">🔥 Streak:</span>
+            <span class="stat-value" id="streak">0 dias</span>
+        </div>
+    </div>
+
+    <div class="quest-map">
+        <div class="header">
+            <h1 id="mainMissionTitle">🗺️ MAPA DE QUEST</h1>
+            <p id="mainMissionSubtitle">🎯 Missão Principal: Carregando...</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">Progresso Geral: 0%</p>
+        </div>
+
+        <div class="timeline" id="timelineContainer">
+            <!-- Phases will be injected here by JavaScript -->
+        </div>
+
+        <div class="next-quest-panel">
+            <h3>🎯 PRÓXIMA QUEST ATIVA</h3>
+            <p id="nextQuestText">Carregando...</p>
+            <p id="nextQuestDeadline">Carregando...</p>
+        </div>
+    </div>
+
+    <div class="achievement-popup" id="achievementPopup">
+        <h2 id="achievementTitle">🎉 CONQUISTA DESBLOQUEADA!</h2>
+        <div id="achievementText"></div>
+        <button onclick="closeAchievement()" style="margin-top: 20px; padding: 10px 20px; background: #fff; color: #000; border: none; border-radius: 10px; cursor: pointer;">Continuar!</button>
+    </div>
+
+    <div id="questDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeQuestDetailModal()">×</span>
+            <h2 id="modalQuestTitle">Detalhes da Quest</h2>
+            <p id="modalQuestDescription"></p>
+            <h4>🚧 Obstáculos Potenciais:</h4>
+            <ul id="modalQuestObstacles"></ul>
+            <h4>📝 Minhas Anotações:</h4>
+            <textarea id="modalQuestNotes" placeholder="Suas anotações, estratégias, aprendizados..."></textarea>
+            <button onclick="saveQuestNotes()" style="margin-top: 15px; padding: 10px 15px; background-color: #4ecdc4; color: white; border: none; border-radius: 5px; cursor: pointer;">Salvar Anotações</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA DEFINITION (O mesmo que antes, com seus dados) ---
+        let gameData = {
+            playerName: "Everton Mereles Costa",
+            mainMission: "Construir um império de IA do zero aos data centers",
+            playerStats: {
+                xp: 0,
+                level: 1,
+                xpToNextLevel: 100,
+                revenue: 0,
+                clients: 0,
+                streak: 0,
+            },
+            phases: [
+                {
+                    id: "phase0_ia",
+                    title: "FASE 0",
+                    subtitle: "Automação Sob Demanda",
+                    icon: "🔧",
+                    timeline: "⏱️ Meses 1-6 | 🎯 R$5K-15K/mês",
+                    milestone: { text: "INÍCIO!", position: "25%" },
+                    rewardText: [
+                        "Título: 'Automatizador Iniciante'",
+                        "Desbloqueia: Fase 1 - SaaS",
+                        "Conquista: Base sólida de clientes"
+                    ],
+                    quests: [
+                        { id: "q0_ia_1", text: "🎯 Definir nicho inicial (contabilidade/imobiliária)", xp: 20, completed: false, obstacles: [], notes: "" },
+                        { id: "q0_ia_2", text: "🌐 Configurar n8n em servidor próprio", xp: 25, completed: false, obstacles: [], notes: "" },
+                        { id: "q0_ia_3", text: "📋 Fazer 10 diagnósticos gratuitos", xp: 30, completed: false, obstacles: [], notes: "" },
+                        { id: "q0_ia_4", text: "🤖 Criar primeira automação completa", xp: 35, completed: false, obstacles: [], notes: "" },
+                        { id: "q0_ia_5", text: "💰 Fechar primeiro contrato de R$1.500+", xp: 50, revenueGain: 1500, clientsGain: 1, completed: false, obstacles: [], notes: "" },
+                        { id: "q0_ia_6", text: "📈 Atingir 5 clientes pagantes", xp: 40, revenueGain: 3500, clientsGain: 4, completed: false, obstacles: [], notes: "" },
+                        { id: "q0_ia_7", text: "📚 Documentar 10 templates replicáveis", xp: 25, completed: false, obstacles: [], notes: "" },
+                        { id: "q0_ia_8", text: "🎊 BOSS: R$10K/mês em receita recorrente", xp: 100, revenueGoal: 10000, completed: false, obstacles: [], notes: "" }
+                    ]
+                },
+                {
+                    id: "phase1_ia",
+                    title: "FASE 1",
+                    subtitle: "Produtos SaaS",
+                    icon: "💻",
+                    timeline: "⏱️ Meses 4-12 | 🎯 R$20K-50K/mês MRR",
+                    milestone: { text: "MVP", position: "50%" },
+                    rewardText: [
+                        "Título: 'Fundador de SaaS'",
+                        "Desbloqueia: Marketplace + Fase 2",
+                        "Conquista: Produto escalável"
+                    ],
+                    quests: [
+                        { id: "q1_ia_1", text: "🔍 Identificar automação mais demandada", xp: 20, completed: false, obstacles: [], notes: "" },
+                        { id: "q1_ia_2", text: "🛠️ Desenvolver MVP em 30 dias", xp: 60, revenueGain: 5000, completed: false, obstacles: [], notes: "" },
+                        { id: "q1_ia_3", text: "🧪 Beta test com 10 clientes", xp: 30, clientsGain: 10, completed: false, obstacles: [], notes: "" },
+                        { id: "q1_ia_4", text: "📊 Atingir NPS 50+", xp: 25, completed: false, obstacles: [], notes: "" },
+                        { id: "q1_ia_5", text: "🚀 Lançar versão pública", xp: 40, completed: false, obstacles: [], notes: "" },
+                        { id: "q1_ia_6", text: "👥 Conseguir 100 usuários ativos", xp: 50, clientsGain: 90, completed: false, obstacles: [], notes: "" },
+                        { id: "q1_ia_7", text: "💳 Implementar cobrança automática", xp: 30, completed: false, obstacles: [], notes: "" },
+                        { id: "q1_ia_8", text: "🎊 BOSS: R$30K MRR sustentável", xp: 100, revenueGoal: 30000, completed: false, obstacles: [], notes: "" }
+                    ]
+                },
+                {
+                    id: "phase15_ia",
+                    title: "FASE 1.5",
+                    subtitle: "Marketplace",
+                    icon: "🏪",
+                    timeline: "⏱️ Meses 8-15 | 🎯 Receita passiva",
+                    milestone: { text: "SCALE", position: "65%" },
+                    rewardText: [
+                        "Título: 'Marketplace Master'",
+                        "Receita passiva estabelecida",
+                        "Network de desenvolvedores"
+                    ],
+                    quests: [
+                        { id: "q15_ia_1", text: "🏪 Criar marketplace de templates", xp: 50, completed: false, obstacles: [], notes: "" },
+                        { id: "q15_ia_2", text: "👥 Recrutar 5 desenvolvedores parceiros", xp: 30, completed: false, obstacles: [], notes: "" },
+                        { id: "q15_ia_3", text: "💰 Sistema de comissões (30%)", xp: 25, completed: false, obstacles: [], notes: "" },
+                        { id: "q15_ia_4", text: "📈 50+ templates no marketplace", xp: 40, completed: false, obstacles: [], notes: "" },
+                        { id: "q15_ia_5", text: "🎊 BOSS: R$10K/mês em comissões", xp: 100, revenueGoal: 10000, completed: false, obstacles: [], notes: "" }
+                    ]
+                },
+                {
+                    id: "phase2_ia",
+                    title: "FASE 2",
+                    subtitle: "Infraestrutura IA",
+                    icon: "🏗️",
+                    timeline: "⏱️ Meses 12-24+ | 🎯 \"AWS da América Latina\"",
+                    milestone: { text: "DATACENTER", position: "85%" },
+                    rewardText: [
+                        "Título: 'Imperador da IA'",
+                        "Infraestrutura continental",
+                        "Legacy empresarial"
+                    ],
+                    quests: [
+                        { id: "q2_ia_1", text: "🌍 Estudo de viabilidade - Itaipu", xp: 30, completed: false, obstacles: [], notes: "" },
+                        { id: "q2_ia_2", text: "🤝 Parcerias com empresas de energia", xp: 40, completed: false, obstacles: [], notes: "" },
+                        { id: "q2_ia_3", text: "📋 Registro jurídico + incentivos", xp: 25, completed: false, obstacles: [], notes: "" },
+                        { id: "q2_ia_4", text: "🏗️ Data center piloto funcional", xp: 70, completed: false, obstacles: [], notes: "" },
+                        { id: "q2_ia_5", text: "🤖 Hospedagem de LLMs próprios", xp: 60, completed: false, obstacles: [], notes: "" },
+                        { id: "q2_ia_6", text: "💰 Primeiros clientes B2B", xp: 50, clientsGain: 5, revenueGain: 50000, completed: false, obstacles: [], notes: "" },
+                        { id: "q2_ia_7", text: "🌎 Expansão para 3 países", xp: 80, completed: false, obstacles: [], notes: "" },
+                        { id: "q2_ia_8", text: "🎊 BOSS FINAL: IPO ou Aquisição", xp: 200, completed: false, obstacles: [], notes: "" }
+                    ]
+                }
+            ]
+        };
+
+        // --- Constantes e Variáveis Globais (O mesmo de antes) ---
+        let TOTAL_QUESTS = 0;
+        const LEVEL_XP_THRESHOLD = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5000, 7000, 10000];
+        const LEVEL_NAMES = ["Novato", "Automatizador", "Fundador SaaS", "Arquiteto de Soluções", "Estrategista de IA", "Mestre do Marketplace", "Visionário Tecnológico", "Construtor de Impérios", "Magnata da IA", "Lenda Digital", "Semideus da Inovação", "Imperador da IA"];
+        let currentOpenQuestId = null;
+
+        // --- DOM Elements Cache (O mesmo de antes) ---
+        let timelineContainer, progressFill, progressText, mainMissionSubtitle, playerNameDisplay,
+            currentLevelDisplay, currentXPDisplay, revenueDisplay, clientsDisplay,
+            completedQuestsCountDisplay, streakDisplay, nextQuestTextDisplay, nextQuestDeadlineDisplay,
+            achievementPopup, achievementTitle, achievementText, questDetailModal,
+            modalQuestTitle, modalQuestDescription, modalQuestObstacles, modalQuestNotes;
+
+        function cacheDOMElements() {
+            timelineContainer = document.getElementById('timelineContainer');
+            progressFill = document.getElementById('progressFill');
+            progressText = document.getElementById('progressText');
+            mainMissionSubtitle = document.getElementById('mainMissionSubtitle');
+            playerNameDisplay = document.getElementById('playerNameDisplay');
+            currentLevelDisplay = document.getElementById('currentLevel');
+            currentXPDisplay = document.getElementById('currentXP');
+            revenueDisplay = document.getElementById('revenue');
+            clientsDisplay = document.getElementById('clients');
+            completedQuestsCountDisplay = document.getElementById('completedQuestsCount');
+            streakDisplay = document.getElementById('streak');
+            nextQuestTextDisplay = document.getElementById('nextQuestText');
+            nextQuestDeadlineDisplay = document.getElementById('nextQuestDeadline');
+            achievementPopup = document.getElementById('achievementPopup');
+            achievementTitle = document.getElementById('achievementTitle');
+            achievementText = document.getElementById('achievementText');
+            questDetailModal = document.getElementById('questDetailModal');
+            modalQuestTitle = document.getElementById('modalQuestTitle');
+            modalQuestDescription = document.getElementById('modalQuestDescription');
+            modalQuestObstacles = document.getElementById('modalQuestObstacles');
+            modalQuestNotes = document.getElementById('modalQuestNotes');
+        }
+
+        // --- Game Logic (O mesmo de antes) ---
+        function calculateTotalQuests() {
+            TOTAL_QUESTS = gameData.phases.reduce((sum, phase) => sum + phase.quests.length, 0);
+        }
+
+        function saveProgress() {
+            localStorage.setItem('evertonQuestGameData_IA_v2', JSON.stringify(gameData)); // Mudei a chave para v2 por causa da alteração de layout HTML
+        }
+
+        function loadProgress() {
+            const savedData = localStorage.getItem('evertonQuestGameData_IA_v2');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                gameData = {
+                    ...gameData,
+                    ...parsedData,
+                    playerStats: {
+                        ...gameData.playerStats,
+                        ...(parsedData.playerStats || {})
+                    },
+                    phases: gameData.phases.map(defaultPhase => {
+                        const savedPhase = parsedData.phases ? parsedData.phases.find(sp => sp.id === defaultPhase.id) : null;
+                        if (savedPhase) {
+                            return {
+                                ...defaultPhase,
+                                ...savedPhase,
+                                quests: defaultPhase.quests.map(defaultQuest => {
+                                    const savedQuest = savedPhase.quests ? savedPhase.quests.find(sq => sq.id === defaultQuest.id) : null;
+                                    return savedQuest ? { ...defaultQuest, ...savedQuest } : defaultQuest;
+                                })
+                            };
+                        }
+                        return defaultPhase;
+                    })
+                };
+            }
+            calculateTotalQuests();
+        }
+
+        function getQuestById(questId) {
+            for (const phase of gameData.phases) {
+                const quest = phase.quests.find(q => q.id === questId);
+                if (quest) return quest;
+            }
+            return null;
+        }
+
+        function toggleQuest(questId) {
+            const quest = getQuestById(questId);
+            if (!quest) return;
+
+            const questWasCompleted = quest.completed;
+            quest.completed = !quest.completed;
+
+            if (quest.completed && !questWasCompleted) {
+                gameData.playerStats.xp += quest.xp || 0;
+                if(quest.revenueGain) gameData.playerStats.revenue += quest.revenueGain;
+                if(quest.clientsGain) gameData.playerStats.clients += quest.clientsGain;
+                gameData.playerStats.streak++;
+                showAchievement("✨ Quest Concluída!", `Você ganhou ${quest.xp || 0} XP por completar: ${quest.text}`);
+
+            } else if (!quest.completed && questWasCompleted) {
+                gameData.playerStats.xp -= quest.xp || 0;
+                if(gameData.playerStats.xp < 0) gameData.playerStats.xp = 0;
+                if(quest.revenueGain) gameData.playerStats.revenue -= quest.revenueGain;
+                if(quest.clientsGain) gameData.playerStats.clients -= quest.clientsGain;
+                gameData.playerStats.streak = Math.max(0, gameData.playerStats.streak -1 );
+            }
+
+            checkLevelUp();
+            updateAllUI();
+            saveProgress();
+        }
+
+        function checkLevelUp() {
+            const oldLevel = gameData.playerStats.level;
+            let newLevel = 1;
+            for (let i = LEVEL_XP_THRESHOLD.length - 1; i >= 0; i--) {
+                if (gameData.playerStats.xp >= LEVEL_XP_THRESHOLD[i]) {
+                    newLevel = i + 1;
+                    break;
+                }
+            }
+            gameData.playerStats.level = newLevel;
+
+            if(gameData.playerStats.level > oldLevel) {
+                showAchievement("🚀 LEVEL UP!", `Você alcançou o Nível ${gameData.playerStats.level}: ${LEVEL_NAMES[gameData.playerStats.level -1]}!`);
+            }
+            gameData.playerStats.xpToNextLevel = LEVEL_XP_THRESHOLD[gameData.playerStats.level] || LEVEL_XP_THRESHOLD[LEVEL_XP_THRESHOLD.length-1] + 2000;
+        }
+
+        function isPhaseCompleted(phase) {
+            return phase.quests.every(q => q.completed);
+        }
+
+        function isPhaseActive(phase) {
+            if (isPhaseCompleted(phase)) return false;
+            if (phase.quests.some(q => q.completed)) return true;
+
+            for (const p of gameData.phases) {
+                if (!isPhaseCompleted(p)) {
+                    return p.id === phase.id;
+                }
+            }
+            return false;
+        }
+
+        // --- UI Rendering (O mesmo de antes, com o ajuste para o phase-subtitle) ---
+        function renderPhases() {
+            timelineContainer.innerHTML = '';
+            gameData.phases.forEach(phaseData => {
+                const phaseDiv = document.createElement('div');
+                phaseDiv.className = 'phase';
+                phaseDiv.id = phaseData.id;
+
+                if (isPhaseCompleted(phaseData)) phaseDiv.classList.add('completed');
+                if (isPhaseActive(phaseData)) phaseDiv.classList.add('active');
+
+                if (phaseData.milestone) {
+                    const milestoneMarker = document.createElement('div');
+                    milestoneMarker.className = 'milestone-marker';
+                    milestoneMarker.style.left = phaseData.milestone.position || '50%';
+                    milestoneMarker.textContent = phaseData.milestone.text;
+                    phaseDiv.appendChild(milestoneMarker);
+                }
+
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'phase-header';
+                const mainTitle = phaseData.title;
+                const subTitle = phaseData.subtitle || '';
+
+
+                headerDiv.innerHTML = `
+                    <div class="phase-icon">${phaseData.icon}</div>
+                    <div class="phase-title-container">
+                        <div class="phase-title">${mainTitle}</div>
+                        <div class="phase-subtitle">${subTitle}</div>
+                    </div>
+                `;
+                phaseDiv.appendChild(headerDiv);
+
+                const timelineDescDiv = document.createElement('div');
+                timelineDescDiv.className = 'phase-timeline-desc';
+                timelineDescDiv.textContent = phaseData.timeline;
+                phaseDiv.appendChild(timelineDescDiv);
+
+                const questListDiv = document.createElement('div');
+                questListDiv.className = 'quest-list';
+                phaseData.quests.forEach(questData => {
+                    const questItemDiv = document.createElement('div');
+                    questItemDiv.className = 'quest-item';
+                    if (questData.completed) questItemDiv.classList.add('completed');
+
+                    questItemDiv.innerHTML = `
+                        <div class="quest-checkbox" onclick="event.stopPropagation(); toggleQuest('${questData.id}')"></div>
+                        <div class="quest-text" onclick="openQuestDetailModal('${questData.id}')">${questData.text}</div>
+                        <div class="quest-xp">${questData.xp || 0} XP</div>
+                    `;
+                    questListDiv.appendChild(questItemDiv);
+                });
+                phaseDiv.appendChild(questListDiv);
+
+                if (phaseData.rewardText && phaseData.rewardText.length > 0) {
+                    const rewardSectionDiv = document.createElement('div');
+                    rewardSectionDiv.className = 'reward-section';
+                    let rewardsHTML = '<div class="reward-title">🏆 RECOMPENSAS</div>';
+                    phaseData.rewardText.forEach(reward => {
+                        rewardsHTML += `<div class="reward-item">• ${reward}</div>`;
+                    });
+                    rewardSectionDiv.innerHTML = rewardsHTML;
+                    phaseDiv.appendChild(rewardSectionDiv);
+                }
+                timelineContainer.appendChild(phaseDiv);
+            });
+        }
+
+        function updateStatsPanel() {
+            playerNameDisplay.textContent = `📊 STATS DE ${gameData.playerName.toUpperCase()}`;
+            currentLevelDisplay.textContent = `${gameData.playerStats.level} (${LEVEL_NAMES[gameData.playerStats.level - 1] || 'Max'})`;
+            currentXPDisplay.textContent = `${gameData.playerStats.xp} / ${gameData.playerStats.xpToNextLevel}`;
+            revenueDisplay.textContent = `R$ ${gameData.playerStats.revenue.toLocaleString('pt-BR')}`;
+            clientsDisplay.textContent = gameData.playerStats.clients;
+
+            const completedCount = gameData.phases.reduce((sum, phase) => sum + phase.quests.filter(q => q.completed).length, 0);
+            completedQuestsCountDisplay.textContent = `${completedCount}/${TOTAL_QUESTS}`;
+            streakDisplay.textContent = `${gameData.playerStats.streak} dias`;
+        }
+
+        function updateOverallProgress() {
+            const completedCount = gameData.phases.reduce((sum, phase) => sum + phase.quests.filter(q => q.completed).length, 0);
+            const percentage = TOTAL_QUESTS > 0 ? (completedCount / TOTAL_QUESTS) * 100 : 0;
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = `Progresso Geral: ${Math.floor(percentage)}%`;
+            const nextMilestonePercentage = Math.ceil(percentage / 25) * 25;
+            if (percentage < 100) {
+                progressText.textContent += ` | Próxima recompensa em: ${nextMilestonePercentage > 100 ? 100 : nextMilestonePercentage}%`;
+            }
+        }
+
+        function updateNextQuestDisplay() {
+            let nextQuest = null;
+            for (const phase of gameData.phases) {
+                for (const quest of phase.quests) {
+                    if (!quest.completed) {
+                        nextQuest = quest;
+                        break;
+                    }
+                }
+                if (nextQuest) break;
+            }
+
+            if (nextQuest) {
+                nextQuestTextDisplay.textContent = nextQuest.text;
+                const phaseIdPrefix = nextQuest.id.substring(0, nextQuest.id.indexOf('_')); // e.g., "q0" from "q0_ia_1"
+                let days = 7;
+                if (phaseIdPrefix === 'q1') days = 14;
+                if (phaseIdPrefix === 'q15') days = 20; // Example for FASE 1.5
+                if (phaseIdPrefix === 'q2') days = 30;
+                nextQuestDeadlineDisplay.textContent = nextQuest.deadline || `Deadline: ${days} dias`;
+            } else {
+                nextQuestTextDisplay.textContent = "🎊 PARABÉNS! TODAS AS QUESTS CONCLUÍDAS!";
+                nextQuestDeadlineDisplay.textContent = "✨ VOCÊ É O IMPERADOR DA IA!";
+            }
+        }
+
+        function updateAllUI() {
+            if (!timelineContainer) cacheDOMElements();
+            document.getElementById('mainMissionTitle').textContent = `🗺️ MAPA DE QUEST`; // Título principal sem nome do jogador, já que está na barra de stats
+            mainMissionSubtitle.textContent = `🎯 Missão Principal: ${gameData.mainMission}`;
+            renderPhases();
+            updateStatsPanel();
+            updateOverallProgress();
+            updateNextQuestDisplay();
+        }
+
+        // --- Achievement Popup Logic (O mesmo de antes) ---
+        function showAchievement(title, text) {
+            achievementTitle.textContent = title;
+            achievementText.innerHTML = text.replace(/\n/g, '<br>');
+            achievementPopup.classList.add('show');
+        }
+
+        function closeAchievement() {
+            achievementPopup.classList.remove('show');
+        }
+
+        // --- Quest Detail Modal Logic (O mesmo de antes) ---
+        function openQuestDetailModal(questId) {
+            currentOpenQuestId = questId;
+            const quest = getQuestById(questId);
+            if (!quest) return;
+
+            modalQuestTitle.textContent = quest.text;
+            modalQuestDescription.textContent = quest.description || "Nenhuma descrição adicional.";
+
+            modalQuestObstacles.innerHTML = '';
+            if (quest.obstacles && quest.obstacles.length > 0) {
+                quest.obstacles.forEach(obs => {
+                    const li = document.createElement('li');
+                    li.textContent = obs;
+                    modalQuestObstacles.appendChild(li);
+                });
+            } else {
+                modalQuestObstacles.innerHTML = '<li>Nenhum obstáculo listado.</li>';
+            }
+
+            modalQuestNotes.value = quest.notes || '';
+            questDetailModal.style.display = "block";
+        }
+
+        function closeQuestDetailModal() {
+            saveQuestNotes();
+            questDetailModal.style.display = "none";
+            currentOpenQuestId = null;
+        }
+
+        function saveQuestNotes() {
+            if (currentOpenQuestId) {
+                const quest = getQuestById(currentOpenQuestId);
+                if (quest) {
+                    quest.notes = modalQuestNotes.value;
+                    saveProgress();
+                }
+            }
+        }
+
+        // Event Listeners for Modal (O mesmo de antes) ---
+        function setupModalEventListeners() {
+            window.onclick = function(event) {
+                if (event.target == questDetailModal) {
+                    closeQuestDetailModal();
+                }
+            }
+            window.onkeydown = function(event) {
+                if (event.key === "Escape" && questDetailModal.style.display === "block") {
+                    closeQuestDetailModal();
+                }
+            }
+        }
+
+        // --- Initialization ---
+        function initializeGame() {
+            cacheDOMElements();
+            loadProgress();
+            checkLevelUp();
+            updateAllUI();
+            setupModalEventListeners();
+            console.log("🎮 Mapa de Quest do Everton Carregado! Que a jornada comece!");
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeGame);
+
+    </script>
+</body>
+</html>
